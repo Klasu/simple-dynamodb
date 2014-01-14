@@ -10,8 +10,8 @@ Usage
         val resultFuture: Future[List[Map[String, String]]] = table.query("searchKey")
       }
       
-      def store = {
-      
+      def store(values: Map[String, String]) = {
+        table.store("Key", "Range", values)
       }
     }
 
