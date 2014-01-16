@@ -1,3 +1,10 @@
+SimpleDynamoDB
+--------------
+
+Very simple Scala library for Amazon Web Services DynamoDB.
+
+Currently supports only tables with both hash and range keys, and only store and query operations.
+
 Installation
 ------------
 
