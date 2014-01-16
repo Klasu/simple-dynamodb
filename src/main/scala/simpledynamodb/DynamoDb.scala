@@ -11,16 +11,18 @@ trait DynamoDb {
 }
 
 object DynamoDb {
+
   import scala.collection.JavaConversions._
 
-  def table(name: String, accessKey: String, secretKey: String, region: String): DynamoDbTable = {
+  def table(name: String, accessKey: String, secretKey: String, region: Option[String] = None): DynamoDbTable = {
     val credentials = new AWSCredentials() {
       override def getAWSAccessKeyId(): String = accessKey
+
       override def getAWSSecretKey(): String = secretKey
     }
 
     val client = new AmazonDynamoDBClient(credentials)
-    client.setRegion(Region.getRegion(Regions.valueOf(region)))
+    region.map(x => client.setRegion(Region.getRegion(Regions.valueOf(x))))
 
     val table = client.describeTable(name).getTable()
     val primaryKey = table.getKeySchema().toList
@@ -32,18 +34,15 @@ object DynamoDb {
 }
 
 class DynamoDbTable(name: String, key: String, range: String, client: AmazonDynamoDBClient) {
+
   import collection.JavaConverters._
 
-  import concurrent.ExecutionContext.Implicits.global
-
   def store(keyValue: String, rangeValue: String, values: Map[String, String]) = {
-    Future{
-      val valuesWithKeys = values ++ Map(key -> keyValue, range -> rangeValue)
-      val itemRequest =
-        new PutItemRequest().withTableName(name)
-          .withItem(valuesWithKeys.mapValues(x => new AttributeValue().withS(x)).asJava)
-      client.putItem(itemRequest)
-    }
+    val valuesWithKeys = values ++ Map(key -> keyValue, range -> rangeValue)
+    val itemRequest =
+      new PutItemRequest().withTableName(name)
+        .withItem(valuesWithKeys.mapValues(x => new AttributeValue().withS(x)).asJava)
+    client.putItem(itemRequest)
   }
 
   def query(searchKey: String): DynamoDbQuery =
@@ -61,7 +60,9 @@ class DynamoDbQuery(keyCondition: Map[String, Condition],
   import collection.JavaConverters._
 
   def asc = new DynamoDbQuery(keyCondition, tableName, client, Some(true), valueLimit)
+
   def desc = new DynamoDbQuery(keyCondition, tableName, client, Some(false), valueLimit)
+
   def limit(x: Int) = new DynamoDbQuery(keyCondition, tableName, client, Some(false), Some(x))
 
   import concurrent.ExecutionContext.Implicits.global
