@@ -24,7 +24,7 @@ Usage
       def table = db.table("TableName", "Credentials", "SecretKey")
       
       def query = {
-        val resultFuture: Future[List[Map[String, String]]] = table.query("searchKey").perform
+        val resultFuture: Future[Iterable[Map[String, String]]] = table.query("searchKey").perform
       }
       
       def store(values: Map[String, String]) = {
