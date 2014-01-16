@@ -67,13 +67,13 @@ class DynamoDbQuery(keyCondition: Map[String, Condition],
 
   import concurrent.ExecutionContext.Implicits.global
 
-  def perform: Future[List[Map[String, String]]] = {
+  def perform: Future[Iterable[Map[String, String]]] = {
     Future {
       val queryRequest =
         new QueryRequest().withTableName(tableName).withKeyConditions(keyCondition.asJava)
       valueLimit.map(queryRequest.setLimit(_))
       ascending.map(queryRequest.setScanIndexForward(_))
-      val items = client.query(queryRequest).getItems.toList
+      val items = client.query(queryRequest).getItems.toIterable
       items.map(x => x.toMap.mapValues(x => x.getS))
     }
   }
