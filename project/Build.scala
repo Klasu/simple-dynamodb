@@ -7,7 +7,7 @@ object ApplicationBuild extends Build {
 
   val main = Project("simple-dynamodb", file("."), settings = Defaults.defaultSettings).settings(
     name := appName,
-    version := "0.1",
+    version := "0.2-SNAPSHOT",
     organization := "com.github.klasu",
     scalaVersion := "2.10.1",
     libraryDependencies ++= Seq(

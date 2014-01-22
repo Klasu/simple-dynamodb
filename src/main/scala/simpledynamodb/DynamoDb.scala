@@ -90,6 +90,11 @@ class DynamoDbQuery(keyCondition: Map[String, Condition],
   }
 }
 
+/**
+ * Single value in DynamoDb. Either DynamoDbString for a String or DynamoDbList for a List[String}
+ *
+ * @param value value
+ */
 sealed class DynamoDbValue(val value: Any)
 
 case class DynamoDbString(override val value: String) extends DynamoDbValue
