@@ -37,11 +37,13 @@ class DynamoDbTable(name: String, key: String, range: String, client: AmazonDyna
 
   import collection.JavaConverters._
 
-  def store(keyValue: String, rangeValue: String, values: Map[String, String]) = {
+  def store(keyValue: String, rangeValue: String, values: Map[String, DynamoDbValue]) = {
     val valuesWithKeys = values ++ Map(key -> keyValue, range -> rangeValue)
     val itemRequest =
-      new PutItemRequest().withTableName(name)
-        .withItem(valuesWithKeys.mapValues(x => new AttributeValue().withS(x)).asJava)
+      new PutItemRequest().withTableName(name).withItem(valuesWithKeys.mapValues {
+        case x: DynamoDbString => new AttributeValue().withS(x.value)
+        case x: DynamoDbList => new AttributeValue().withSS(x.value.asJavaCollection)
+      }.asJava)
     client.putItem(itemRequest)
   }
 
@@ -67,15 +69,30 @@ class DynamoDbQuery(keyCondition: Map[String, Condition],
 
   import concurrent.ExecutionContext.Implicits.global
 
-  def perform: Future[Iterable[Map[String, String]]] = {
+  def perform: Future[Iterable[Map[String, DynamoDbValue]]] = {
+    val queryRequest =
+      new QueryRequest().withTableName(tableName).withKeyConditions(keyCondition.asJava)
+
+    valueLimit.map(queryRequest.setLimit(_))
+    ascending.map(queryRequest.setScanIndexForward(_))
+
     Future {
-      val queryRequest =
-        new QueryRequest().withTableName(tableName).withKeyConditions(keyCondition.asJava)
-      valueLimit.map(queryRequest.setLimit(_))
-      ascending.map(queryRequest.setScanIndexForward(_))
       val items = client.query(queryRequest).getItems.toIterable
-      items.map(x => x.toMap.mapValues(x => x.getS))
+      items.map(x => x.toMap.mapValues(toDynamoDbValue(_)))
+    }
+  }
+
+  private def toDynamoDbValue(value: AttributeValue): DynamoDbValue = {
+    value match {
+      case x: AttributeValue if x.getSS != null => DynamoDbList(value.getSS.toList)
+      case x: AttributeValue => DynamoDbString(x.getS)
     }
   }
 }
+
+sealed class DynamoDbValue(val value: Any)
+
+case class DynamoDbString(override val value: String) extends DynamoDbValue
+
+case class DynamoDbList(override val value: List[String]) extends DynamoDbValue
 

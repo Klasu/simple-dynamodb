@@ -11,7 +11,8 @@ object ApplicationBuild extends Build {
     organization := "com.github.klasu",
     scalaVersion := "2.10.1",
     libraryDependencies ++= Seq(
-      "com.amazonaws" % "aws-java-sdk" % "1.6.7"
+      "com.amazonaws" % "aws-java-sdk" % "1.6.7",
+      "org.specs2" %% "specs2" % "2.3.7" % "test"
     ),
 
     // Publishing stuff
