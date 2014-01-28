@@ -43,6 +43,7 @@ class DynamoDbTable(name: String, key: String, range: String, client: AmazonDyna
       new PutItemRequest().withTableName(name).withItem(valuesWithKeys.mapValues {
         case x: DynamoDbString => new AttributeValue().withS(x.value)
         case x: DynamoDbList => new AttributeValue().withSS(x.value.asJavaCollection)
+        case x: String => new AttributeValue().withS(x)
       }.asJava)
     client.putItem(itemRequest)
   }

@@ -24,11 +24,32 @@ Usage
       def table = db.table("TableName", "Credentials", "SecretKey")
       
       def query = {
-        val resultFuture: Future[Iterable[Map[String, String]]] = table.query("searchKey").perform
+        val resultFuture: Future[Iterable[Map[String, DynamoDbValue]]] = table.query("searchKey").perform
       }
       
-      def store(values: Map[String, String]) = {
+      def store(values: Map[String, DynamoDbValue]) = {
         table.store("Key", "Range", values)
       }
     }
 
+To create a new DynamoDbValue:
+
+    val dynamoString = DynamoDbString("a string")
+    val dynamoList = DynamoDbList(List("a string", "another string"))
+    
+To handle values you can either:
+
+    def asString(dynamoValue: DynamoDbValue): String {
+        dynamoValue match {
+            case x: DynamoDbString => x.value
+            case x: DynamoDbList => x.value.mkString
+        }
+    }
+Or:
+
+    def asString(value: DynamoDbValue): String {
+       dynamoValue.value match {
+            case x: String => x
+            case x: List[String] => x.mkString
+       }
+    }
