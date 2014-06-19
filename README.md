@@ -39,17 +39,13 @@ To create a new DynamoDbValue:
     
 To handle values you can either:
 
-    def asString(dynamoValue: DynamoDbValue): String {
-        dynamoValue match {
-            case x: DynamoDbString => x.value
-            case x: DynamoDbList => x.value.mkString
-        }
+    def asString(value: DynamoDbValue): String = value match {
+        case x: DynamoDbString => x.value
+        case x: DynamoDbList => x.value.mkString
     }
 Or:
 
-    def asString(value: DynamoDbValue): String {
-       dynamoValue.value match {
-            case x: String => x
-            case x: List[String] => x.mkString
-       }
-    }
+    def asString(value: DynamoDbValue): String = value.value match {
+        case x: String => x
+        case x: List[String] => x.mkString
+   }
