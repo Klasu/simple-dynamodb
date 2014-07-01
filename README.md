@@ -48,4 +48,4 @@ Or:
     def asString(value: DynamoDbValue): String = value.value match {
         case x: String => x
         case x: List[String] => x.mkString
-   }
+    }
