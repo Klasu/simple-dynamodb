@@ -12,7 +12,7 @@ Add to your project's Build.scala
     
     resolvers += "Sonatype snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/",
     libraryDependencies ++= Seq(
-        "com.github.klasu" %% "simple-dynamodb" % "0.1-SNAPSHOT"
+        "com.github.klasu" %% "simple-dynamodb" % "0.3-SNAPSHOT"
     )
 
 Usage

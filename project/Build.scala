@@ -7,11 +7,11 @@ object ApplicationBuild extends Build {
 
   val main = Project("simple-dynamodb", file("."), settings = Defaults.defaultSettings).settings(
     name := appName,
-    version := "0.2",
+    version := "0.3-SNAPSHOT",
     organization := "com.github.klasu",
     scalaVersion := "2.10.1",
     libraryDependencies ++= Seq(
-      "com.amazonaws" % "aws-java-sdk" % "1.6.7",
+      "com.amazonaws" % "aws-java-sdk" % "1.8.9.1",
       "org.specs2" %% "specs2" % "2.3.7" % "test"
     ),
 
